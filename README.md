@@ -16,7 +16,7 @@
         -h|--help                Shows usage
         -c|--clean|--cleanup     Deletes expired uploads
         [-s|--share] FILE [TTL]  Shares a file with TTL in minutes (default: 5)
-        -d|--delete	FILE         Deletes a file under ~/.wshare (used internally)
+        -d|--delete	FILE...      Deletes files under ~/.wshare (used internally)
 
 ## Supported Platforms
 
