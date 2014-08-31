@@ -11,8 +11,9 @@ shopt -s \
 
 WSHARE_HOME="$HOME/.wshare"
 
-ERR_INVALID_USAGE=1
-ERR_FILE_NOT_FOUND=2
+ERR_UNSUPPORTED_OS=1
+ERR_INVALID_USAGE=2
+ERR_FILE_NOT_FOUND=3
 
 die () {
 	local message="$1"
@@ -174,17 +175,23 @@ main () {
 	esac
 }
 
+do_install () {
+	local bin_dir="$HOME/bin"
+	mkdir -p "$bin_dir"
+
+	local bin_file="$bin_dir/wshare"
+	rm -f "$bin_file"
+	echo "$BASH_EXECUTION_STRING" > "$bin_file"
+	chmod +x "$bin_file"
+}
+
 install () {
 	local os="$(uname)"
 	case "$os" in
 		Linux|Darwin)
-			local bin_dir="$HOME/bin"
-			mkdir -p "$bin_dir"
+			[[ "$(whoami)" != "root" ]] || die "Don't install with sudo or as root"
 
-			local bin_file="$bin_dir/wshare"
-			rm -f "$bin_file"
-			echo "$BASH_EXECUTION_STRING" > "$bin_file"
-			chmod +x "$bin_file"
+			do_install
 
 			if [[ "$(type -t wshare)" != "file" ]]; then
 				cat <<-EOF
@@ -199,8 +206,7 @@ install () {
 			echo "Successfully installed wshare!"
 			;;
 		*)
-			echo "Error: Unsupported OS: $os"
-			exit 1
+			die "Unsupported OS: $os"
 			;;
 	esac
 }
