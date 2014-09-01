@@ -169,8 +169,12 @@ main () {
 			shift
 			delete "$@"
 			;;
-		*)
+		"-s"|"--share")
+			shift
 			upload_and_shorten "$@"
+			;;
+		*)
+			main --share $*
 			;;
 	esac
 }
