@@ -125,10 +125,13 @@ upload_and_shorten () {
 
 	eval "$(shorten "$upload_url" "$ttl")"
 
+	local db_dir="$WSHARE_HOME/$shorturl_ttl"
+	mkdir -p "$db_dir"
+	local db_file="$db_dir/$upload_id"
 	if [[ -n "$upload_key" ]]; then
-		local dir="$WSHARE_HOME/$shorturl_ttl"
-		mkdir -p "$dir"
-		echo "$upload_key $shorturl_url" > "$dir/$upload_id"
+		echo "$upload_key $shorturl_url" > "$db_file"
+	elif [[ -w "$db_file" ]]; then
+		touch "$db_file"
 	fi
 
 	echo "$shorturl_url"
