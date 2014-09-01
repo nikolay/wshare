@@ -19,12 +19,12 @@ die () {
 	local message="$1"
 	local -i exit_code="${2:-1}"
 
-	echo "Error: $message" >&2
+	echo "Error $exit_code: $message" >&2
 
 	exit $exit_code
 }
 
-#alias call="eval"
+alias call="eval"
 
 result () {
 	declare -p $* | sed "s/^declare /local /"
@@ -79,13 +79,17 @@ delete () {
 
 		upload_id="$(basename "$file")"
 
-		read -r upload_key shorturl_url < "$file"
-
-		echo "Deleting $shorturl_url at http://0paste.com/$upload_id with key $upload_key"
+		{
+			read -r upload_key
+			while read -r shorturl_url; do
+				echo "Deleting $shorturl_url at http://0paste.com/$upload_id with key $upload_key"
+			done
+		} < "$file"
 
 		response="$(curl -sL "http://0paste.com/$upload_id" -F "_method=delete" -F "paste[key]=$upload_key")"
 
 		rm "$file"
+		rmdir "$(dirname "$file")" || true
 	done
 }
 
@@ -96,13 +100,11 @@ cleanup () {
 	local upload_path
 	local upload_id
 	local upload_key
-	local -a files
 	local ttl
 	local -i any=0
 	for ttl_dir in "$WSHARE_HOME"/*; do
 		if [[ -n "$ttl_dir" && -d "$ttl_dir" ]]; then
-			files=("$ttl_dir"/*)
-			if [[ "${#files[@]}" -gt 0 ]]; then
+			if [[ "$(ls -A "$ttl_dir")" ]]; then
 				ttl="$(basename "$ttl_dir")"
 				find "$ttl_dir"/* -maxdepth 0 -type f -mmin +$ttl -exec $0 --delete {} \;
 				any=1
@@ -115,27 +117,37 @@ cleanup () {
 	fi
 }
 
-upload_and_shorten () {
-	local file="$1"
+share () {
+	local uri="$1"
 	local ttl="${2:-5}"
 
 	[[ $ttl -ge 5 ]] || die "TTL cannot be less than 5 minutes"
 
-	eval "$(upload "$file")"
-
-	eval "$(shorten "$upload_url" "$ttl")"
-
-	local db_dir="$WSHARE_HOME/$shorturl_ttl"
-	mkdir -p "$db_dir"
-	local db_file="$db_dir/$upload_id"
-	if [[ -n "$upload_key" ]]; then
-		echo "$upload_key $shorturl_url" > "$db_file"
-	elif [[ -w "$db_file" ]]; then
-		touch "$db_file"
+	if [[ "$uri" =~ ^http?:// ]]; then
+		local upload_url="$uri"
+	else
+		call "$(upload "$uri")"
 	fi
 
+	call "$(shorten "$upload_url" "$ttl")"
+
+	if [[ -n "${upload_id:-}" ]]; then
+		local db_dir="$WSHARE_HOME/$shorturl_ttl"
+		mkdir -p "$db_dir"
+		local db_file="$db_dir/$upload_id"
+		if [[ -n "$upload_key" ]]; then
+			cat <<-EOF > "$db_file"
+				$upload_key
+				$shorturl_url
+			EOF
+		elif [[ -w "$db_file" ]]; then
+			echo "$shorturl_url" >> "$db_file"
+		fi
+	fi
+
+	echo -n "$shorturl_url" | pbcopy
+
 	echo "$shorturl_url"
-	echo "$shorturl_url" | pbcopy
 }
 
 show_usage () {
@@ -143,10 +155,10 @@ show_usage () {
 		Usage: $(basename $0) COMMAND
 
 		Commands:
-		    -h|--help                Shows usage
-		    -c|--clean|--cleanup     Deletes expired uploads
-		    [-s|--share] FILE [TTL]  Shares a file with TTL in minutes (default: 5)
-		    -d|--delete	FILE...      Deletes files under $WSHARE_HOME (used internally)
+		    -h|--help                    Shows usage
+		    -c|--clean|--cleanup         Deletes expired uploads
+		    [-s|--share] FILE|URL [TTL]  Shares a file or URL with TTL in minutes (default: 5)
+		    -d|--delete	FILE...          Deletes files under $WSHARE_HOME (used internally)
 	EOF
 }
 
@@ -174,7 +186,7 @@ main () {
 			;;
 		"-s"|"--share")
 			shift
-			upload_and_shorten "$@"
+			share "$@"
 			;;
 		*)
 			main --share $*

@@ -13,10 +13,10 @@
     Usage: wshare COMMAND
 
     Commands:
-        -h|--help                Shows usage
-        -c|--clean|--cleanup     Deletes expired uploads
-        [-s|--share] FILE [TTL]  Shares a file with TTL in minutes (default: 5)
-        -d|--delete	FILE...      Deletes files under ~/.wshare (used internally)
+        -h|--help                    Shows usage
+        -c|--clean|--cleanup         Deletes expired uploads
+        [-s|--share] FILE|URL [TTL]  Shares a file or URL with TTL in minutes (default: 5)
+        -d|--delete	FILE...          Deletes files under ~/.wshare (used internally)
 
 ## Supported Platforms
 
