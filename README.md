@@ -6,7 +6,7 @@
 
 ## Installation
 
-    bash -c "$(curl "https://raw.githubusercontent.com/nikolay/wshare/master/wshare.sh")"
+    bash -c "$(curl -sL git.io/wshare || echo "echo Installation failed; exit 1")"
 
 ## Usage
 
@@ -26,4 +26,4 @@
 
 ## License
 
-The license of the project is the [MIT](https://github.com/limetext/lime/blob/master/LICENSE).
+The license of the project is the [MIT](https://github.com/nikolay/wshare/blob/master/LICENSE).
