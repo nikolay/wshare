@@ -218,7 +218,7 @@ install () {
 		Linux|Darwin)
 			[[ "$(whoami)" != "root" ]] || die "Don't install with sudo or as root"
 
-			local -i upgrade
+			local -i upgrade=0
 			[[ -x "$WSHARE_BIN" ]] && upgrade=1
 
 			do_install
