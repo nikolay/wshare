@@ -9,7 +9,10 @@ shopt -s \
 	nullglob \
 	expand_aliases
 
+WSHARE_VERSION=""
+
 WSHARE_HOME="$HOME/.wshare"
+WSHARE_BIN="$HOME/bin/wshare"
 
 ERR_UNSUPPORTED_OS=1
 ERR_INVALID_USAGE=2
@@ -184,6 +187,10 @@ main () {
 			shift
 			delete "$@"
 			;;
+		"-u"|"--upgrade")
+			shift
+			install
+			;;
 		"-s"|"--share")
 			shift
 			share "$@"
@@ -194,14 +201,15 @@ main () {
 	esac
 }
 
-do_install () {
-	local bin_dir="$HOME/bin"
-	mkdir -p "$bin_dir"
+get_latest_version () {
+	basename "$(curl -s -o /dev/null -I -w "%{redirect_url}" https://github.com/nikolay/wshare/releases/latest)"
+}
 
-	local bin_file="$bin_dir/wshare"
-	rm -f "$bin_file"
-	echo "$BASH_EXECUTION_STRING" > "$bin_file"
-	chmod +x "$bin_file"
+do_install () {
+	mkdir -p "$(dirname "$WSHARE_BIN")"
+	rm -f "$WSHARE_BIN"
+	echo "${BASH_EXECUTION_STRING/WSHARE_VERSION=""/WSHARE_VERSION="$(get_latest_version)"}" > "$WSHARE_BIN"
+	chmod +x "$WSHARE_BIN"
 }
 
 install () {
@@ -209,6 +217,9 @@ install () {
 	case "$os" in
 		Linux|Darwin)
 			[[ "$(whoami)" != "root" ]] || die "Don't install with sudo or as root"
+
+			local verb="installed"
+			[[ -x "$WSHARE_BIN" ]] && verb="upgraded"
 
 			do_install
 
@@ -222,7 +233,7 @@ install () {
 				EOF
 			fi
 
-			echo "Successfully installed wshare!"
+			echo "Successfully $verb wshare $(get_latest_version)"
 			;;
 		*)
 			die "Unsupported OS: $os"
