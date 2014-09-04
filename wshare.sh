@@ -189,7 +189,7 @@ main () {
 			share "$@"
 			;;
 		*)
-			main --share $*
+			main --share "$@"
 			;;
 	esac
 }
