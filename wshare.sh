@@ -218,8 +218,8 @@ install () {
 		Linux|Darwin)
 			[[ "$(whoami)" != "root" ]] || die "Don't install with sudo or as root"
 
-			local verb="installed"
-			[[ -x "$WSHARE_BIN" ]] && verb="upgraded"
+			local -i upgrade
+			[[ -x "$WSHARE_BIN" ]] && upgrade=1
 
 			do_install
 
@@ -233,7 +233,11 @@ install () {
 				EOF
 			fi
 
-			echo "Successfully $verb wshare $(get_latest_version)"
+			if [[ $upgrade -eq 1 ]]; then
+				echo "Successfully upgraded wshare to $(get_latest_version)"
+			else
+				echo "Successfully installed wshare $WSHARE_VERSION"
+			fi
 			;;
 		*)
 			die "Unsupported OS: $os"
