@@ -92,8 +92,10 @@ delete () {
 		response="$(curl -sL "http://0paste.com/$upload_id" -F "_method=delete" -F "paste[key]=$upload_key")"
 
 		rm "$file"
-		rmdir "$(dirname "$file")" || true
+
+		rmdir "$(dirname "$file")" 2>/dev/null || true
 	done
+	rmdir "$WSHARE_HOME" 2>/dev/null || true
 }
 
 cleanup () {
