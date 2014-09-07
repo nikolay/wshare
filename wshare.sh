@@ -216,7 +216,8 @@ assignment () {
 do_install () {
 	mkdir -p "$(dirname "$WSHARE_BIN")"
 	rm -f "$WSHARE_BIN"
-	echo "${BASH_EXECUTION_STRING/$(assignment WSHARE_VERSION)/$(assignment WSHARE_VERSION "$(get_latest_version)")}" > "$WSHARE_BIN"
+	local self="${BASH_EXECUTION_STRING:-$(curl -sL git.io/wshare)}"
+	echo "${self/$(assignment WSHARE_VERSION)/$(assignment WSHARE_VERSION "$(get_latest_version)")}" > "$WSHARE_BIN"
 	chmod +x "$WSHARE_BIN"
 }
 
