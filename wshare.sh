@@ -9,11 +9,14 @@ shopt -s \
 	nullglob \
 	expand_aliases
 
-WSHARE_HOME="$HOME/.wshare"
+readonly WSHARE_VERSION=""
 
-ERR_UNSUPPORTED_OS=1
-ERR_INVALID_USAGE=2
-ERR_FILE_NOT_FOUND=3
+readonly WSHARE_HOME="$HOME/.wshare"
+readonly WSHARE_BIN="$HOME/bin/wshare"
+
+readonly ERR_UNSUPPORTED_OS=1
+readonly ERR_INVALID_USAGE=2
+readonly ERR_FILE_NOT_FOUND=3
 
 die () {
 	local message="$1"
@@ -172,19 +175,23 @@ main () {
 
 	local command="${1:-}"
 	case "$command" in
-		"-h"|"--help")
+		("-h" | "--help")
 			shift
 			show_usage
 			;;
-		"-c"|"--clean"|"--cleanup")
+		("-c" | "--clean" | "--cleanup")
 			shift
 			cleanup
 			;;
-		"-d"|"--delete")
+		("-d" | "--delete")
 			shift
 			delete "$@"
 			;;
-		"-s"|"--share")
+		("-u" | "--upgrade")
+			shift
+			install
+			;;
+		("-s" | "--share")
 			shift
 			share "$@"
 			;;
@@ -194,25 +201,34 @@ main () {
 	esac
 }
 
-do_install () {
-	local bin_dir="$HOME/bin"
-	mkdir -p "$bin_dir"
+get_latest_version () {
+	basename "$(curl -s -o /dev/null -I -w "%{redirect_url}" https://github.com/nikolay/wshare/releases/latest)"
+}
 
-	local bin_file="$bin_dir/wshare"
-	rm -f "$bin_file"
-	echo "$BASH_EXECUTION_STRING" > "$bin_file"
-	chmod +x "$bin_file"
+do_install () {
+	mkdir -p "$(dirname "$WSHARE_BIN")"
+	rm -f "$WSHARE_BIN"
+	echo -en "$BASH_EXECUTION_STRING"
+	echo "${BASH_EXECUTION_STRING/WSHARE_VERSION=\"\"/WSHARE_VERSION=\"$(get_latest_version)\"}" > "$WSHARE_BIN"
+	chmod +x "$WSHARE_BIN"
+}
+
+check_install () {
+	[[ "$(type -t wshare)" == "file" ]]
 }
 
 install () {
 	local os="$(uname)"
 	case "$os" in
-		Linux|Darwin)
+		(Linux | Darwin)
 			[[ "$(whoami)" != "root" ]] || die "Don't install with sudo or as root"
+
+			local -i upgrade=0
+			check_install && upgrade=1
 
 			do_install
 
-			if [[ "$(type -t wshare)" != "file" ]]; then
+			if ! check_install; then
 				cat <<-EOF
 					In order to make wshare work, you need to add the following
 					to your .bashrc/.bash_profile/.profile file:
@@ -222,7 +238,13 @@ install () {
 				EOF
 			fi
 
-			echo "Successfully installed wshare!"
+			local version="$(get_latest_version)"
+			if [[ $upgrade -eq 1 ]]; then
+				echo "Successfully upgraded wshare to $version"
+			else
+				echo "Successfully installed wshare $version"
+			fi
+
 			;;
 		*)
 			die "Unsupported OS: $os"
