@@ -16,6 +16,7 @@
         -h|--help                    Shows usage
         -c|--clean|--cleanup         Deletes expired uploads
         [-s|--share] FILE|URL [TTL]  Shares a file or URL with TTL in minutes (default: 5)
+        -u|--upgrade                 Upgrades wshare to the latest version
         -d|--delete	FILE...          Deletes files under ~/.wshare (used internally)
 
 ## Supported Platforms
@@ -26,4 +27,5 @@
 
 ## License
 
-The license of the project is the [MIT](https://github.com/nikolay/wshare/blob/master/LICENSE).
+Licensed under [MIT](https://github.com/nikolay/wshare/blob/master/LICENSE).
+Copyright [Nikolay Kolev](https://github.com/nikolay).
