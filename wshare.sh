@@ -153,6 +153,10 @@ share () {
 	echo "$shorturl_url"
 }
 
+get_latest_version () {
+	basename "$(curl -s -o /dev/null -I -w "%{redirect_url}" https://github.com/nikolay/wshare/releases/latest)"
+}
+
 show_usage () {
 	cat <<-EOF
 		Usage: $(basename $0) COMMAND
@@ -160,7 +164,8 @@ show_usage () {
 		Commands:
 		    -h|--help                    Shows usage
 		    -c|--clean|--cleanup         Deletes expired uploads
-		    [-s|--share] FILE|URL [TTL]  Shares a file or URL with TTL in minutes (default: 5)
+		   [-s|--share] FILE|URL [TTL]  Shares a file or URL with TTL in minutes (default: 5)
+		    -u|--upgrade                 Upgrades wshare to the latest version
 		    -d|--delete	FILE...          Deletes files under $WSHARE_HOME (used internally)
 	EOF
 }
@@ -199,10 +204,6 @@ main () {
 			main --share "$@"
 			;;
 	esac
-}
-
-get_latest_version () {
-	basename "$(curl -s -o /dev/null -I -w "%{redirect_url}" https://github.com/nikolay/wshare/releases/latest)"
 }
 
 do_install () {
