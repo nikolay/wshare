@@ -208,7 +208,6 @@ get_latest_version () {
 do_install () {
 	mkdir -p "$(dirname "$WSHARE_BIN")"
 	rm -f "$WSHARE_BIN"
-	echo -en "$BASH_EXECUTION_STRING"
 	echo "${BASH_EXECUTION_STRING/WSHARE_VERSION=\"\"/WSHARE_VERSION=\"$(get_latest_version)\"}" > "$WSHARE_BIN"
 	chmod +x "$WSHARE_BIN"
 }
