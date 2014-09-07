@@ -206,10 +206,17 @@ main () {
 	esac
 }
 
+assignment () {
+	local variable="${1:-}"
+	local value="${2:-}"
+
+	echo "$variable=\"$value\""
+}
+
 do_install () {
 	mkdir -p "$(dirname "$WSHARE_BIN")"
 	rm -f "$WSHARE_BIN"
-	echo "${BASH_EXECUTION_STRING/WSHARE_VERSION=\"\"/WSHARE_VERSION=\"$(get_latest_version)\"}" > "$WSHARE_BIN"
+	echo "${BASH_EXECUTION_STRING/$(assignment WSHARE_VERSION)/$(assignment WSHARE_VERSION "$(get_latest_version)")}" > "$WSHARE_BIN"
 	chmod +x "$WSHARE_BIN"
 }
 
