@@ -18,7 +18,7 @@ readonly ERR_UNSUPPORTED_OS=1
 readonly ERR_INVALID_USAGE=2
 readonly ERR_FILE_NOT_FOUND=3
 
-die () {
+die() {
 	local message="$1"
 	local -i exit_code="${2:-1}"
 
@@ -29,11 +29,23 @@ die () {
 
 alias call="eval"
 
-result () {
+clipboard_copy() {
+	if [[ -n "$(type -t pbcopy)" ]]; then
+		pbcopy
+	elif [[ -n "$(type -t xsel)" ]]; then
+		xsel --clipboard --input
+	elif [[ -n "$(type -t xclip)" ]]; then
+		xclip -selection clipboard
+	else
+		:
+	fi
+}
+
+result() {
 	declare -p $* | sed "s/^declare /local /"
 }
 
-upload () {
+upload() {
 	local file="$1"
 
 	[[ -r "$file" ]] || die "File $file does not exist or is not accessible" $ERR_FILE_NOT_FOUND
@@ -56,7 +68,7 @@ upload () {
 	result upload_id upload_url upload_key
 }
 
-shorten () {
+shorten() {
 	local url="$1"
 	local -i ttl="${2:-5}"
 
@@ -71,7 +83,7 @@ shorten () {
 	result shorturl_url shorturl_key shorturl_ttl
 }
 
-delete () {
+delete() {
 	local file
 	local upload_id
 	local upload_key
@@ -98,7 +110,7 @@ delete () {
 	rmdir "$WSHARE_HOME" 2>/dev/null || true
 }
 
-cleanup () {
+cleanup() {
 	[[ -d "$WSHARE_HOME" ]] || return
 
 	local ttl_dir
@@ -122,7 +134,7 @@ cleanup () {
 	fi
 }
 
-share () {
+share() {
 	local uri="$1"
 	local ttl="${2:-5}"
 
@@ -141,7 +153,7 @@ share () {
 		mkdir -p "$db_dir"
 		local db_file="$db_dir/$upload_id"
 		if [[ -n "$upload_key" ]]; then
-			cat <<-EOF > "$db_file"
+			cat  > "$db_file" <<-EOF
 				$upload_key
 				$shorturl_url
 			EOF
@@ -150,16 +162,16 @@ share () {
 		fi
 	fi
 
-	echo -n "$shorturl_url" | pbcopy
+	echo -n "$shorturl_url" | clipboard_copy
 
 	echo "$shorturl_url"
 }
 
-get_latest_version () {
+get_latest_version() {
 	basename "$(curl -s -o /dev/null -I -w "%{redirect_url}" https://github.com/nikolay/wshare/releases/latest)"
 }
 
-show_usage () {
+show_usage() {
 	cat <<-EOF
 		Usage: $(basename $0) COMMAND
 
@@ -172,12 +184,12 @@ show_usage () {
 	EOF
 }
 
-usage () {
+usage() {
 	show_usage
 	exit $ERR_INVALID_USAGE
 }
 
-main () {
+main() {
 	[[ $# -gt 0 ]] || usage
 
 	local command="${1:-}"
@@ -202,20 +214,20 @@ main () {
 			shift
 			share "$@"
 			;;
-		*)
+		(*)
 			main --share "$@"
 			;;
 	esac
 }
 
-assignment () {
+assignment() {
 	local variable="${1:-}"
 	local value="${2:-}"
 
 	echo "$variable=\"$value\""
 }
 
-do_install () {
+do_install() {
 	mkdir -p "$(dirname "$WSHARE_BIN")"
 	rm -f "$WSHARE_BIN"
 	local self="${BASH_EXECUTION_STRING:-$(curl -sL git.io/wshare)}"
@@ -223,11 +235,11 @@ do_install () {
 	chmod +x "$WSHARE_BIN"
 }
 
-check_install () {
+check_install() {
 	[[ "$(type -t wshare)" == "file" ]]
 }
 
-install () {
+install() {
 	local os="$(uname)"
 	case "$os" in
 		(Linux | Darwin)
@@ -256,7 +268,7 @@ install () {
 			fi
 
 			;;
-		*)
+		(*)
 			die "Unsupported OS: $os"
 			;;
 	esac
