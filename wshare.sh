@@ -164,11 +164,11 @@ show_usage () {
 		Usage: $(basename $0) COMMAND
 
 		Commands:
-		    -h|--help                    Shows usage
-		    -c|--clean|--cleanup         Deletes expired uploads
-		   [-s|--share] FILE|URL [TTL]   Shares a file or URL with TTL in minutes (default: 5)
-		    -u|--upgrade|--update        Upgrades wshare to the latest version
-		    -d|--delete	FILE...          Deletes files under $WSHARE_HOME (used internally)
+		    -h|--help                   Shows usage
+		    -c|--clean|--cleanup        Deletes expired uploads
+		   [-s|--share] FILE|URL [TTL]  Shares a file/URL; TTL in minutes (default: 5)
+		    -u|--upgrade|--update       Upgrades wshare to the latest version
+		    -d|--delete	FILE...         Deletes files under $WSHARE_HOME (used internally)
 	EOF
 }
 
