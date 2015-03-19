@@ -29,3 +29,6 @@
 
 Licensed under [MIT](https://github.com/nikolay/wshare/blob/master/LICENSE).
 Copyright by [Nikolay Kolev](https://github.com/nikolay).
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/nikolay/wshare/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
