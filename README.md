@@ -1,6 +1,8 @@
 [![Stories in Ready](https://badge.waffle.io/nikolay/wshare.png?label=ready&title=Ready)](https://waffle.io/nikolay/wshare)
 # wshare
 
+[![Join the chat at https://gitter.im/nikolay/wshare](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nikolay/wshare?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## About
 
 [wshare](https://github.com/nikolay/wshare) wraps [Zeropaste](http://0paste.com) by [@edogawaconan](https://github.com/edogawaconan) with [ShoutKey](http://shoutkey.com/) by [@jazzychad](https://github.com/jazzychad) to allow uploading text files from the console and producing short and easy to remember URL that don't require clipboard access or great short-term memory. This also works around Zeropaste's limitation of not having a self-destruct option by recording the deletion keys locally and providing a command to delete the expired ones.
