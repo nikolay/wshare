@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/nikolay/wshare.png?label=ready&title=Ready)](https://waffle.io/nikolay/wshare)
 # wshare
 
 ## About
